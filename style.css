@@ -1,0 +1,10 @@
+#instructions{
+  font-style:italic;
+}
+#route{
+  display:grid;
+  grid-template:auto / max-content max-content max-content;
+  grid-gap:1em;
+  margin:1em;
+  text-align:center;
+}
