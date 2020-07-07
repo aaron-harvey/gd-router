@@ -2,8 +2,7 @@ import * as acts from './acts.js'
 
 const ROUTE=document.querySelector('#route')
 
-function pick(items){//adapted from https://stackoverflow.com/a/5915122
-  if(items.length==0) return false
+function pick(items){//https://stackoverflow.com/a/5915122
   return items[Math.floor(Math.random() * items.length)];
 }
 
@@ -31,14 +30,14 @@ class Route{
     let level=1
     for(;level<=50;){
       let act=pick(acts.normal.get(level))
-      if(this.acts.length>0&&act==this.acts.slice(-1)[0][1]) 
-        continue
-      this.acts.push([level,act,act.difficulties[0],''])
+      let faction=act.factions.length==0?'':pick(act.factions)
+      this.acts.push([level,act,act.difficulties[0],faction])
       level=Math.min(act.normal[1],next(level))
     }
     for(;level<=100;level++){
       let act=pick(acts.elite.get(level))
-      this.acts.push([level,act,act.difficulties[1],''])
+      let faction=act.factions.length==0?'':pick(act.factions)
+      this.acts.push([level,act,act.difficulties[1],faction])
       level=Math.min(act.elite[1],next(level))
     }
   }

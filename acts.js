@@ -26,7 +26,7 @@ class Act{
 var act1=new class extends Act{
   constructor(){
     super('Act 1')
-    this.factions=[]
+    this.factions=["Devil's Crossing"]
     this.normal=[1,30] 
     this.elite=[45,65]
     this.ultimate=[70,100]
@@ -35,7 +35,7 @@ var act1=new class extends Act{
 var act2=new class extends Act{
   constructor(){
     super('Act 2')
-    this.factions=[]
+    this.factions=['Rovers']
     this.normal=[18,40] 
     this.elite=[52,68]
     this.ultimate=[73,100]
@@ -44,7 +44,7 @@ var act2=new class extends Act{
 var act3=new class extends Act{
   constructor(){
     super('Act 3')
-    this.factions=[]
+    this.factions=['Homestead',"Kymon's Chosen","Order of Death's Vigil"]
     this.normal=[26,48] 
     this.elite=[56,70]
     this.ultimate=[74,100]
@@ -53,7 +53,7 @@ var act3=new class extends Act{
 var act4=new class extends Act{
   constructor(){
     super('Act 4')
-    this.factions=[]
+    this.factions=['The Black Legion','The Outcast']
     this.normal=[33,60] 
     this.elite=[63,70]
     this.ultimate=[77,100]
@@ -62,7 +62,7 @@ var act4=new class extends Act{
 var act5=new class extends Act{
   constructor(){
     super('Act 5')
-    this.factions=[]
+    this.factions=['Coven of Ugdenbog','Barrowholm']
     this.normal=[36,66] 
     this.elite=[65,82]
     this.ultimate=[71,120]
@@ -71,7 +71,7 @@ var act5=new class extends Act{
 var act6=new class extends Act{
   constructor(){
     super('Act 6')
-    this.factions=[]
+    this.factions=['Malmouth Resistance']
     this.normal=[63,75] 
     this.elite=[74,90]
     this.ultimate=[85,120]
@@ -80,7 +80,7 @@ var act6=new class extends Act{
 var act7=new class extends Act{
   constructor(){
     super('Act 7')
-    this.factions=[]
+    this.factions=['Cult of Bysmiel','Cult of Dreeg','Cult of Solael']
     this.normal=[15,75] 
     this.elite=[25,90]
     this.ultimate=[30,120]
