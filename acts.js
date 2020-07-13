@@ -1,4 +1,5 @@
 const DIFFICULTIES=['Normal/Veteran','Elite','Ultimate']
+const ALL=[]
 
 export var normal=new Map()//balanced acts by player level
 export var elite=new Map()
@@ -8,13 +9,14 @@ export var elite=new Map()
  * might want to  add the possiblity of a end-game linear run at some point? 
  */
 class Act{
-  constructor(name){
+  constructor(name,enabled=true){
     this.name=name//string
     this.factions=[] //array of strings
     this.normal=[] //level range
     this.elite=[]//level range
     this.ultimate=[]//level range
     this.difficulties=DIFFICULTIES//difficulty labels
+    if(enabled) ALL.push(this)
   }
   
   valid(level,difficulty=false){
@@ -96,9 +98,16 @@ var crucible=new class extends Act{
     this.difficulties=['Aspirant','Challenger','Gladiator']
   }
 }
+/* TODO
+ * sr is a pain in the ass to unlock in-game
+ * handling it intelligently would require:
+ * - adding prerequisite acts logic, which is easy enough to do
+ * - making each difficulty an individual Act so the prerequisite logic work on each campaign
+ * Considering SR is by far the worst content in SR it's dubious wether the effort is worth it.
+ */
 var sr=new class extends Act{
   constructor(){
-    super('Shattered Realm')
+    super('Shattered Realm',false)
     this.factions=[]
     this.normal=[1,100] 
     this.elite=[1,100]
@@ -115,11 +124,10 @@ var ultimate=new class extends Act{//hack that represent a "linear ultimate run"
     this.difficulties=['Ultimate','Ultimate','Ultimate']
   }
 }
-var all=[act1,act2,act3,act4,act5,act6,act7,crucible,sr,ultimate]
 
 export function setup(){
   for(let i=1;i<=100;i++){
-    normal.set(i,all.filter(a=>a.valid(i,a.normal)))
-    elite.set(i,all.filter(a=>a.valid(i,a.elite)))
+    normal.set(i,ALL.filter(a=>a.valid(i,a.normal)))
+    elite.set(i,ALL.filter(a=>a.valid(i,a.elite)))
   }
 }
