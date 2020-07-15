@@ -1,133 +1,68 @@
+/* TODO
+ * sr is a pain in the ass to unlock in-game (needs to c omplete whole Act 1), handling it intelligently would require:
+ * - adding prerequisite acts logic, which is easy enough to do
+ */
 const DIFFICULTIES=['Normal/Veteran','Elite','Ultimate']
 const ALL=[]
+const FACTIONS={
+  1:["Devil's Crossing"],
+  2:['Rovers'],
+  3:['Homestead',"Kymon's Chosen","Order of Death's Vigil"],
+  4:['The Black Legion','The Outcast'],
+  5:['Coven of Ugdenbog','Barrowholm'],
+  6:['Malmouth Resistance'],
+  7:['Cult of Bysmiel','Cult of Dreeg','Cult of Solael'],
+}
 
-export var normal=new Map()//balanced acts by player level
-export var elite=new Map()
-
-/* TODO 
- * ultimate cannot be used as you can't unlock riftgates easily
- * might want to  add the possiblity of a end-game linear run at some point? 
- */
 class Act{
-  constructor(name,enabled=true){
+  constructor(name,minlevel,maxlevel,difficulty,factions=[],enabled=true){
     this.name=name//string
-    this.factions=[] //array of strings
-    this.normal=[] //level range
-    this.elite=[]//level range
-    this.ultimate=[]//level range
-    this.difficulties=DIFFICULTIES//difficulty labels
+    this.factions=factions //array of strings
+    this.levels=[minlevel,maxlevel] //level range
+    this.difficulty=difficulty//difficulty label
     if(enabled) ALL.push(this)
   }
   
-  valid(level,difficulty=false){
-    return difficulty[0]<=level&&level<=difficulty[1]
-  }
-  
+  valid(level){return this.levels[0]<=level&&level<=this.levels[1]}
   toString(){return this.name}
 }
-var act1=new class extends Act{
-  constructor(){
-    super('Act 1')
-    this.factions=["Devil's Crossing"]
-    this.normal=[1,30] 
-    this.elite=[45,65]
-    this.ultimate=[70,100]
-  }
-}
-var act2=new class extends Act{
-  constructor(){
-    super('Act 2')
-    this.factions=['Rovers']
-    this.normal=[18,40] 
-    this.elite=[52,68]
-    this.ultimate=[73,100]
-  }
-}
-var act3=new class extends Act{
-  constructor(){
-    super('Act 3')
-    this.factions=['Homestead',"Kymon's Chosen","Order of Death's Vigil"]
-    this.normal=[26,48] 
-    this.elite=[56,70]
-    this.ultimate=[74,100]
-  }
-}
-var act4=new class extends Act{
-  constructor(){
-    super('Act 4')
-    this.factions=['The Black Legion','The Outcast']
-    this.normal=[33,60] 
-    this.elite=[63,70]
-    this.ultimate=[77,100]
-  }
-}
-var act5=new class extends Act{
-  constructor(){
-    super('Act 5')
-    this.factions=['Coven of Ugdenbog','Barrowholm']
-    this.normal=[36,66] 
-    this.elite=[65,82]
-    this.ultimate=[71,120]
-  }
-}
-var act6=new class extends Act{
-  constructor(){
-    super('Act 6')
-    this.factions=['Malmouth Resistance']
-    this.normal=[63,75] 
-    this.elite=[74,90]
-    this.ultimate=[85,120]
-  }
-}
-var act7=new class extends Act{
-  constructor(){
-    super('Act 7')
-    this.factions=['Cult of Bysmiel','Cult of Dreeg','Cult of Solael']
-    this.normal=[15,75] 
-    this.elite=[25,90]
-    this.ultimate=[30,120]
-  }
-}
-var crucible=new class extends Act{
-  constructor(){
-    super('Crucible')
-    this.factions=[]
-    this.normal=[1,100] 
-    this.elite=[1,100]
-    this.ultimate=[1,100]
-    this.difficulties=['Aspirant','Challenger','Gladiator']
-  }
-}
-/* TODO
- * sr is a pain in the ass to unlock in-game
- * handling it intelligently would require:
- * - adding prerequisite acts logic, which is easy enough to do
- * - making each difficulty an individual Act so the prerequisite logic work on each campaign
- * Considering SR is by far the worst content in SR it's dubious wether the effort is worth it.
- */
-var sr=new class extends Act{
-  constructor(){
-    super('Shattered Realm',false)
-    this.factions=[]
-    this.normal=[1,100] 
-    this.elite=[1,100]
-    this.ultimate=[1,100]
-  }
-}
-var ultimate=new class extends Act{//hack that represent a "linear ultimate run" as endgame
-  constructor(){
-    super('Ultimate campaign')
-    this.factions=[]
-    this.normal=[0,0] 
-    this.elite=[70,100]
-    this.ultimate=[0,0]
-    this.difficulties=['Ultimate','Ultimate','Ultimate']
-  }
-}
+
+export var normal=[
+  new Act('Act 1',1,30,DIFFICULTIES[0],FACTIONS[1]),
+  new Act('Act 2',18,40,DIFFICULTIES[0],FACTIONS[2]),
+  new Act('Act 3',26,48,DIFFICULTIES[0],FACTIONS[3]),
+  new Act('Act 4',33,60,DIFFICULTIES[0],FACTIONS[4]),
+  new Act('Act 5',36,66,DIFFICULTIES[0],FACTIONS[5]),
+  new Act('Act 6',63,75,DIFFICULTIES[0],FACTIONS[6]),
+  new Act('Act 7',15,75,DIFFICULTIES[0],FACTIONS[7]),
+  new Act('Crucible',5,75,'Aspirant'), //5 as levelling from 1 can be a major pain in Crucible
+  new Act('Shattered Realm',18,75,DIFFICULTIES[0]), //can be accessed as Act 1 is "mandatory"
+]
+export var elite=[
+  new Act('Act 1',45,65,DIFFICULTIES[1],FACTIONS[1]),
+  new Act('Act 2',52,68,DIFFICULTIES[1],FACTIONS[2]),
+  new Act('Act 3',56,70,DIFFICULTIES[1],FACTIONS[3]),
+  new Act('Act 4',63,70,DIFFICULTIES[1],FACTIONS[4]),
+  new Act('Act 5',65,82,DIFFICULTIES[1],FACTIONS[5]),
+  new Act('Act 6',74,90,DIFFICULTIES[1],FACTIONS[6]),
+  new Act('Act 7',25,90,DIFFICULTIES[1],FACTIONS[7]),
+  new Act('Crucible',45,90,'Challenger'),
+  new Act('Shattered Realm',45,90,DIFFICULTIES[1],[],false), //TODO disabled until can ensure Act 1 elite is unlocked
+]
+export var ultimate=[//most of ultimate cannot be used as you can't unlock riftgates easily
+  new Act('Act 1',70,100,DIFFICULTIES[2],FACTIONS[1]), //enabled as can be done straight away but won't pass validations as a repeat act
+  new Act('Act 2',73,100,DIFFICULTIES[2],FACTIONS[2],false),
+  new Act('Act 3',74,100,DIFFICULTIES[2],FACTIONS[3],false),
+  new Act('Act 4',77,100,DIFFICULTIES[2],FACTIONS[4],false),
+  new Act('Act 5',71,120,DIFFICULTIES[2],FACTIONS[5],false),
+  new Act('Act 6',85,120,DIFFICULTIES[2],FACTIONS[6],false),
+  new Act('Act 7',30,120,DIFFICULTIES[2],FACTIONS[7],false),
+  new Act('Crucible',70,120,'Challenger',[]),
+  new Act('Shattered Realm',70,120,DIFFICULTIES[2],[],false), //TODO disabled until can ensure Act 1 ulti is unlocked
+]
+export var bylevel=new Map()
 
 export function setup(){
-  for(let i=1;i<=100;i++){
-    normal.set(i,ALL.filter(a=>a.valid(i,a.normal)))
-    elite.set(i,ALL.filter(a=>a.valid(i,a.elite)))
-  }
+  for(let i=1;i<=100;i++)
+    bylevel.set(i,ALL.filter(a=>a.valid(i,a.normal)))
 }

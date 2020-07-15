@@ -7,4 +7,5 @@
   grid-gap:1em;
   margin:1em;
   text-align:center;
+  width:min-content;
 }

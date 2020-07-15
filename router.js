@@ -12,41 +12,43 @@ function roll(min, max) {//https://developer.mozilla.org/pt-BR/docs/Web/JavaScri
   return Math.floor(Math.random() * (max - min)) + min;
 }
 
-function next(level){
-  return level+roll(10,30)
-}
 
 function round(level){
-  return Math.round(level/10)*10
+  return level<10?level:Math.round(level/10)*10
 }
 
+/* As is, Act 1 (normal) is always the first one, as 
+ */
 class Route{
   constructor(){
-    this.acts=[]//array of [level,act,difficulty,faction]
+    this.acts=[]//array of [level,act]
   }
   
-  //TODO could separate acts into one instance per difficulty, this would make climbing difficulty less awsward (just make sure the next routing step is never lower difficulty)
+  get last(){return this.acts[this.acts.length-1][1]} //last act
+  
+  get nextlevel(){
+    let last=this.acts[this.acts.length-1]
+    let min=last[0]+10
+    let max=last[1].levels[1]
+    let a=roll(min,max)
+    let b=roll(min,max)
+    return Math.min(a,b)
+  }
+  
   generate(){
-    let level=1
-    for(;level<=50;){
-      let act=pick(acts.normal.get(level))
-      let faction=act.factions.length==0?'':pick(act.factions)
-      this.acts.push([level,act,act.difficulties[0],faction])
-      level=Math.min(act.normal[1],next(level))
+    for(let level=1;level<=90;level=this.nextlevel){
+      level=round(level)
+      let act=pick(acts.bylevel.get(level))
+      this.acts.push([level,act])
+      if(!this.validate()) return false
     }
-    for(;level<=100;level++){
-      let act=pick(acts.elite.get(level))
-      let faction=act.factions.length==0?'':pick(act.factions)
-      this.acts.push([level,act,act.difficulties[1],faction])
-      level=Math.min(act.elite[1],next(level))
-    }
+    return true
   }
   
   validate(){
-    //if(this.acts.length<5) return false
     for(let i=0;i<this.acts.length;i++)
       for(let j=i+1;j<this.acts.length;j++)
-        if(this.acts[i][1]==this.acts[j][1])
+        if(this.acts[i][1].name==this.acts[j][1].name)
           return false
     return true
   }
@@ -55,21 +57,17 @@ class Route{
 export function setup(){
   acts.setup()
   let r=false
-  while(!r||!r.validate()){
-    r=new Route()
-    r.generate()
-  }
+  while(!r||!r.generate()) r=new Route()
   for(let a of r.acts){
     let level=document.createElement('div')
-    let l=a[0]
-    if(l>1) l=round(l)
-    level.innerHTML='Level '+l
+    level.innerHTML='Level '+a[0]
     ROUTE.appendChild(level)
     let act=document.createElement('div')
-    act.innerHTML=`${a[1]} (${a[2].toLowerCase()})`
+    act.innerHTML=`${a[1]} (${a[1].difficulty.toLowerCase()})`
     ROUTE.appendChild(act)
     let faction=document.createElement('div')
-    faction.innerHTML=a[3]
+    if(a[1].factions.length>0)
+      faction.innerHTML=pick(a[1].factions)
     ROUTE.appendChild(faction)
   }
 }
