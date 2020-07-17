@@ -31,9 +31,6 @@ class Area{
   iselite(level){
     return this.elite[0]<=level&&level<=this.elite[1]
   }
-  valid(level){
-    return this.isnormal(level)||this.iselite(level)
-  }
 }
 export var acts={//TODO wiki shows compeltely different level ranges from Grim Tools
   0:[new Area("Crucible",[10,40],[20,80])], //levels = median of campaign

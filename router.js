@@ -21,7 +21,7 @@ function round(level){
  */
 class Route{
   constructor(){
-    this.acts=[]//array of [level,act]
+    this.acts=[]//array of [level,act,elite]
   }
   
   get last(){return this.acts.length>1&&this.acts[this.acts.length-1][1]} //last act
@@ -35,23 +35,33 @@ class Route{
     return Math.min(a,b)
   }*/
   
+  //TODO try using levels from wiki instead, only act 1 and 7 being used for normal
   generate(){
     let elite=false
     for(let level=1;level<=90;){
-      let candidates=acts.sequential.filter(a=>!this.last||a.index==-1||a.index>this.last.index)
-      candidates=candidates.filter(a=>a.valid(level))
+      let candidates=acts.sequential
+      let last=this.last
+      if(last){
+        candidates=candidates.filter(a=>
+          a.index==-1||a.index>last.index||
+          (!elite&&!a.isnormal(level)&&a.iselite(level)))
+      }
+      candidates=candidates.filter(a=>(!elite&&a.isnormal(level))||a.iselite(level))
       if(candidates.length==0){
-        level+=1
+        if(elite) level+=1
+        else elite=true
         continue
       }
-      //TODO try using levels from wiki instead
-      console.log(level,candidates.map(c=>c.name))
+      //console.log(level,candidates.map(c=>c.name))
       let act=pick(candidates)
-      this.acts.push([level,act])
-      if(!elite) elite=!act.isnormal(level)&&act.iselite(level)
+      if(act==last) return false
+      //console.log('elite',elite)
       if(!this.validate()) return false
-      level=elite?roll(level,act.elite[1])+1
-        :roll(level,act.normal[1])+1
+      if(!elite) elite=!act.isnormal(level)&&act.iselite(level)
+      this.acts.push([level,act,elite])
+      level=elite?roll(level,act.elite[1])
+        :roll(level,act.normal[1])
+      level+=1
     }
     return true
   }
@@ -74,8 +84,7 @@ export function setup(){
     level.innerHTML='Level '+a[0]
     ROUTE.appendChild(level)
     let difficulty=document.createElement('div')
-    difficulty.innerHTML=
-      a[1].isnormal(a[0])?'Normal/veteran':'Elite'
+    difficulty.innerHTML=a[2]?'Elite':'Normal/veteran'
     ROUTE.appendChild(difficulty)
     let act=document.createElement('div')
     if(a[1].act>=1) act.innerHTML=`Act ${a[1].act}`
