@@ -33,7 +33,7 @@ class Area{
   }
 }
 export var acts={//TODO wiki shows compeltely different level ranges from Grim Tools
-  0:[new Area("Crucible",[10,40],[20,80])], //levels = median of campaign
+  0:[new Area("Crucible",[5,75],[5,90])],
   1:[
     new Area("Devil's crossing",[1,4],[1,65]),
     new Area("Lower crossing",[4,7],[5,65]),
@@ -106,10 +106,10 @@ export var sequential=[]
 
 export function setup(){
   let i=0
-  for(let act=1;act<=7;act++)
+  for(let act=0;act<=7;act++) if(acts[act])
     for(let a of acts[act]){
       a.act=act
-      a.index=i++
+      if(act>0) a.index=i++
       sequential.push(a)
     }
 }

@@ -24,7 +24,7 @@ class Route{
     this.acts=[]//array of [level,act,elite]
   }
   
-  get last(){return this.acts.length>1&&this.acts[this.acts.length-1][1]} //last act
+  get last(){return this.acts.length>0&&this.acts[this.acts.length-1][1]} //last act
   
   /*get nextlevel(){
     let last=this.acts[this.acts.length-1]
@@ -38,38 +38,37 @@ class Route{
   //TODO try using levels from wiki instead, only act 1 and 7 being used for normal
   generate(){
     let elite=false
-    for(let level=1;level<=90;){
+    for(let level=1;level<90;){
       let candidates=acts.sequential
       let last=this.last
       if(last){
-        candidates=candidates.filter(a=>
-          a.index==-1||a.index>last.index||
-          (!elite&&!a.isnormal(level)&&a.iselite(level)))
+        candidates=candidates.filter(c=>this.acts.map(a=>a[1]).indexOf(c)<0)
+        candidates=candidates.filter(
+          a=>a.index==-1||a.index>last.index||(!elite&&!a.isnormal(level)&&a.iselite(level)))
       }
       candidates=candidates.filter(a=>(!elite&&a.isnormal(level))||a.iselite(level))
       if(candidates.length==0){
-        if(elite) level+=1
-        else elite=true
+        level+=1
         continue
       }
-      //console.log(level,candidates.map(c=>c.name))
       let act=pick(candidates)
       if(act==last) return false
-      //console.log('elite',elite)
-      if(!this.validate()) return false
       if(!elite) elite=!act.isnormal(level)&&act.iselite(level)
       this.acts.push([level,act,elite])
-      level=elite?roll(level,act.elite[1])
-        :roll(level,act.normal[1])
-      level+=1
+      let min=level+1
+      let max=Math.min(level+9,elite?act.elite[1]:act.normal[1])
+      level=roll(min,max)
+      if(!this.validate()) return false
     }
-    return true
+    return this.acts.length<=9*2&&
+      new Set(this.acts.map(a=>a[1].act).filter(a=>2<=a&&a)).size>=6&&
+      true//this.acts.map(a=>a[1].act).filter(a=>2<=a&&a<=6).length>=3
   }
   
   validate(){
     for(let i=0;i<this.acts.length;i++)
       for(let j=i+1;j<this.acts.length;j++)
-        if(this.acts[i][1].name==this.acts[j][1].name)
+        if(this.acts[i][1]==this.acts[j][1])
           return false
     return true
   }
