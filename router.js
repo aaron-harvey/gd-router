@@ -24,23 +24,34 @@ class Route{
     this.acts=[]//array of [level,act]
   }
   
-  get last(){return this.acts[this.acts.length-1][1]} //last act
+  get last(){return this.acts.length>1&&this.acts[this.acts.length-1][1]} //last act
   
-  get nextlevel(){
+  /*get nextlevel(){
     let last=this.acts[this.acts.length-1]
     let min=last[0]+10
     let max=last[1].levels[1]
     let a=roll(min,max)
     let b=roll(min,max)
     return Math.min(a,b)
-  }
+  }*/
   
   generate(){
-    for(let level=1;level<=90;level=this.nextlevel){
-      level=round(level)
-      let act=pick(acts.bylevel.get(level))
+    let elite=false
+    for(let level=1;level<=90;){
+      let candidates=acts.sequential.filter(a=>!this.last||a.index==-1||a.index>this.last.index)
+      candidates=candidates.filter(a=>a.valid(level))
+      if(candidates.length==0){
+        level+=1
+        continue
+      }
+      //TODO try using levels from wiki instead
+      console.log(level,candidates.map(c=>c.name))
+      let act=pick(candidates)
       this.acts.push([level,act])
+      if(!elite) elite=!act.isnormal(level)&&act.iselite(level)
       if(!this.validate()) return false
+      level=elite?roll(level,act.elite[1])+1
+        :roll(level,act.normal[1])+1
     }
     return true
   }
@@ -62,12 +73,15 @@ export function setup(){
     let level=document.createElement('div')
     level.innerHTML='Level '+a[0]
     ROUTE.appendChild(level)
+    let difficulty=document.createElement('div')
+    difficulty.innerHTML=
+      a[1].isnormal(a[0])?'Normal/veteran':'Elite'
+    ROUTE.appendChild(difficulty)
     let act=document.createElement('div')
-    act.innerHTML=`${a[1]} (${a[1].difficulty.toLowerCase()})`
+    if(a[1].act>=1) act.innerHTML=`Act ${a[1].act}`
     ROUTE.appendChild(act)
-    let faction=document.createElement('div')
-    if(a[1].factions.length>0)
-      faction.innerHTML=pick(a[1].factions)
-    ROUTE.appendChild(faction)
+    let area=document.createElement('div')
+    area.innerHTML=a[1]
+    ROUTE.appendChild(area)
   }
 }

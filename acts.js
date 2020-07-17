@@ -14,55 +14,105 @@ const FACTIONS={
   7:['Cult of Bysmiel','Cult of Dreeg','Cult of Solael'],
 }
 
-class Act{
-  constructor(name,minlevel,maxlevel,difficulty,factions=[],enabled=true){
+class Area{
+  constructor(name,normal,elite){
     this.name=name//string
-    this.factions=factions //array of strings
-    this.levels=[minlevel,maxlevel] //level range
-    this.difficulty=difficulty//difficulty label
-    if(enabled) ALL.push(this)
+    this.normal=normal//[minlevel,maxlevel]
+    this.elite=elite//[minlevel,maxlevel]
+    this.act=-1//defined dynamically
+    this.index=-1//0-based order of apparition, defined dynamically if applicable
   }
-  
-  valid(level){return this.levels[0]<=level&&level<=this.levels[1]}
+
   toString(){return this.name}
+  
+  isnormal(level){
+    return this.normal[0]<=level&&level<=this.normal[1]
+  }
+  iselite(level){
+    return this.elite[0]<=level&&level<=this.elite[1]
+  }
+  valid(level){
+    return this.isnormal(level)||this.iselite(level)
+  }
+}
+export var acts={//TODO wiki shows compeltely different level ranges from Grim Tools
+  0:[new Area("Crucible",[10,40],[20,80])], //levels = median of campaign
+  1:[
+    new Area("Devil's crossing",[1,4],[1,65]),
+    new Area("Lower crossing",[4,7],[5,65]),
+    new Area("Wightmire",[6,9],[8,65]),
+    new Area("Foggy bank",[8,12],[10,68]),
+    new Area("Flooded passage",[9,13],[12,68]),
+    new Area("Burrwitch outskirts",[12,15],[15,65]),
+    new Area("Burrwitch village",[12,18],[15,68]),
+    new Area("Warden's cellar",[15,25],[18,68]),
+    new Area("Underground transit",[16,30],[19,69]),
+    new Area("Warden's laboratory",[16,30],[19,69]),
+  ],
+  2:[
+    new Area("Arkovian foothills",[19,38],[22,70]),
+    new Area("Old Arkovia",[20,37],[23,69]),
+    new Area("Cronley's hideout",[21,40],[24,72]),
+    new Area("Twin falls",[21,40],[24,72]),
+    new Area("Broken hills",[23,45],[26,72]),
+    new Area("Smugller's pass",[25,45],[30,75]),
+  ],
+  3:[
+    new Area("Deadman's gulch",[26,45],[32,75]),
+    new Area("Prospector's trail",[28,45],[35,76]),
+    new Area("Pine barrens",[28,48],[45,76]),
+    new Area("Homestead",[28,48],[45,76]),
+    new Area("Rotting croplands",[28,48],[45,76]),
+  ],
+  4:[
+    new Area("Sorrow's bastion",[30,45],[36,76]),
+    new Area("Blood grove",[31,58],[38,76]),
+    new Area("Darkvale gate",[33,50],[40,77]),
+    new Area("Asterkarn mountains",[30,60],[50,75]),
+    new Area("Asterkarn road",[30,60],[50,75]),
+    new Area("Asterkarn valley",[30,60],[50,75]),
+    new Area("Fort Ikon",[34,60],[42,77]),
+    new Area("Gates of Necropolis",[35,60],[45,78]),
+    new Area("Necropolis interior",[36,60],[46,78]),
+  ],
+  5:[
+    new Area("Gloomwald",[36,62],[50,80]),
+    new Area("Gloomwald crossing",[36,62],[50,80]),
+    new Area("Coven's refuge",[38,65],[55,80]),
+    new Area("Ugdenbog",[38,65],[55,80]),
+    new Area("Barrowholm",[38,66],[58,82]),
+  ],
+  6:[
+    new Area("Lone watch",[40,70],[63,85]),
+    new Area("Malmouth outskirts",[42,70],[63,85]),
+    new Area("Malmouth sewers",[42,72],[63,85]),
+    new Area("Steelcap district",[44,72],[68,86]),
+    new Area("Crown hill",[46,75],[66,90]),
+  ],
+  7:[
+    new Area("Conclave of the Three",[15,75],[25,90]),
+    new Area("Korvan plateau",[15,75],[25,90]),
+    new Area("Temple of Osyr",[15,75],[25,90]),
+    new Area("Korvan sands",[15,75],[25,90]),
+    new Area("Kaian docks",[15,75],[25,90]),
+    new Area("Sunbase oasis",[15,75],[25,90]),
+    new Area("Vanguard of the Three",[18,75],[28,90]),
+    new Area("Ruins of Abyd",[18,75],[28,90]),
+    new Area("Infernal wastes",[20,75],[30,90]),
+    new Area("Korvan city",[22,75],[33,90]),
+    new Area("Tomb of the Eldritch Sun",[24,75],[35,90]),
+    new Area("Eldritch gate",[24,75],[35,90]),
+  ]
 }
 
-export var normal=[
-  new Act('Act 1',1,30,DIFFICULTIES[0],FACTIONS[1]),
-  new Act('Act 2',18,40,DIFFICULTIES[0],FACTIONS[2]),
-  new Act('Act 3',26,48,DIFFICULTIES[0],FACTIONS[3]),
-  new Act('Act 4',33,60,DIFFICULTIES[0],FACTIONS[4]),
-  new Act('Act 5',36,66,DIFFICULTIES[0],FACTIONS[5]),
-  new Act('Act 6',63,75,DIFFICULTIES[0],FACTIONS[6]),
-  new Act('Act 7',15,75,DIFFICULTIES[0],FACTIONS[7]),
-  new Act('Crucible',5,75,'Aspirant'), //5 as levelling from 1 can be a major pain in Crucible
-  new Act('Shattered Realm',18,75,DIFFICULTIES[0]), //can be accessed as Act 1 is "mandatory"
-]
-export var elite=[
-  new Act('Act 1',45,65,DIFFICULTIES[1],FACTIONS[1]),
-  new Act('Act 2',52,68,DIFFICULTIES[1],FACTIONS[2]),
-  new Act('Act 3',56,70,DIFFICULTIES[1],FACTIONS[3]),
-  new Act('Act 4',63,70,DIFFICULTIES[1],FACTIONS[4]),
-  new Act('Act 5',65,82,DIFFICULTIES[1],FACTIONS[5]),
-  new Act('Act 6',74,90,DIFFICULTIES[1],FACTIONS[6]),
-  new Act('Act 7',25,90,DIFFICULTIES[1],FACTIONS[7]),
-  new Act('Crucible',45,90,'Challenger'),
-  new Act('Shattered Realm',45,90,DIFFICULTIES[1],[],false), //TODO disabled until can ensure Act 1 elite is unlocked
-]
-export var ultimate=[//most of ultimate cannot be used as you can't unlock riftgates easily
-  new Act('Act 1',70,100,DIFFICULTIES[2],FACTIONS[1]), //enabled as can be done straight away but won't pass validations as a repeat act
-  new Act('Act 2',73,100,DIFFICULTIES[2],FACTIONS[2],false),
-  new Act('Act 3',74,100,DIFFICULTIES[2],FACTIONS[3],false),
-  new Act('Act 4',77,100,DIFFICULTIES[2],FACTIONS[4],false),
-  new Act('Act 5',71,120,DIFFICULTIES[2],FACTIONS[5],false),
-  new Act('Act 6',85,120,DIFFICULTIES[2],FACTIONS[6],false),
-  new Act('Act 7',30,120,DIFFICULTIES[2],FACTIONS[7],false),
-  new Act('Crucible',70,120,'Challenger',[]),
-  new Act('Shattered Realm',70,120,DIFFICULTIES[2],[],false), //TODO disabled until can ensure Act 1 ulti is unlocked
-]
-export var bylevel=new Map()
+export var sequential=[]
 
 export function setup(){
-  for(let i=1;i<=100;i++)
-    bylevel.set(i,ALL.filter(a=>a.valid(i,a.normal)))
+  let i=0
+  for(let act=1;act<=7;act++)
+    for(let a of acts[act]){
+      a.act=act
+      a.index=i++
+      sequential.push(a)
+    }
 }
