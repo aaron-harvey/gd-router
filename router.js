@@ -21,11 +21,11 @@ class Route{
   constructor(){
     this.milestones={//TODO should be easy enough to have 1 milestone = 1 act, no act 1 while leveling!
       1:['Aspirant','','Crucible'], //crucible
-      20:false, //normal - or elite from get-go?
-      30:false, 
-      40:false,
-      50:false, //elite
-      60:false,
+      25:false, //normal - or elite from get-go?
+      35:false, 
+      45:false,
+      55:false, //elite
+      65:false,
       70:['Ultimate','Act 1','Main quest'], //act 1 ultimate
       100:['Ultimate','Act 7','Shattered Realm'],
     }
@@ -36,13 +36,14 @@ class Route{
   //TODO can try using levels from wiki instead
   generate(){
     let pool=new Set([2,3,4,5,6,7])
-    for(let level=20;level<=60;level+=10){
+    for(let level of Object.keys(this.milestones).slice(1,6)){
+      level=Number(level)
       if(pool.size==0) return false
-      let difficulty=level<50?'Normal':'Elite'
+      let difficulty='Elite'
       let candidates=Array.from(pool).flatMap(act=>acts.acts[act])
-      let arealevel=level+roll(1,4)-1
-      candidates=candidates.filter(
-        area=>difficulty=='Normal'?area.isnormal(arealevel):area.iselite(arealevel))
+      let arealevel=level+1
+      candidates=candidates.filter(area=>area.iselite(arealevel))
+      if(candidates.length==0) return false
       let area=pick(Array.from(candidates))
       this.milestones[level]=[difficulty,'Act '+area.act,area.name]
       pool.delete(area.act)
@@ -51,8 +52,20 @@ class Route{
   }
 }
 
+function test(){ //9-pass console output with ?debug URL parameter
+  if(window.location.href.indexOf('debug')<0) return
+  for(let i=0;i<9;){
+    let r=new Route()
+    if(r.generate()){
+      i+=1
+      console.log(Object.keys(r.milestones).slice(1,6).map(level=>r.milestones[level][1]))
+    }
+  }
+}
+
 export function setup(){
   acts.setup()
+  test()
   let r=false
   while(!r||!r.generate()) r=new Route()
   for(let m of Object.keys(r.milestones)){
