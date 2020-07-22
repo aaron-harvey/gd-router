@@ -1,6 +1,7 @@
 import * as acts from './acts.js'
 
 const ROUTE=document.querySelector('#route')
+const ATTEMPTS=10000
 
 function pick(items){//https://stackoverflow.com/a/5915122
   return items[Math.floor(Math.random() * items.length)];
@@ -67,7 +68,12 @@ export function setup(){
   acts.setup()
   test()
   let r=false
-  while(!r||!r.generate()) r=new Route()
+  for(let i=0;i<ATTEMPTS;i++){
+    r=new Route()
+    if(r.generate()) break
+    r=false
+  }
+  if(!r) throw 'Could not generate'
   for(let m of Object.keys(r.milestones)){
     let level=document.createElement('div')
     level.innerHTML=m==100?'End-game':'Level '+m
