@@ -20,15 +20,15 @@ function round(level){
 
 class Route{
   constructor(){
-    this.milestones={//TODO should be easy enough to have 1 milestone = 1 act, no act 1 while leveling!
-      1:['Aspirant','','Crucible'], 
-      20:false, 
-      30:false, 
+    this.milestones={
+      1:['Elite','Act 1','Main quest'], 
+      20:false,
+      25:false,
+      30:false,
+      35:false,
       40:false,
-      50:false, 
-      60:false, 
-      70:['Ultimate','Act 1','Main quest'], //act 1 ultimate
-      100:['Ultimate','Act 7','Shattered Realm'],
+      45:false,
+      50:['Elite','Act 7','Shattered Realm'],
     }
   }
   
@@ -38,16 +38,10 @@ class Route{
   generate(){
     let pool=new Set([2,3,4,5,6,7])
     let levels=Object.keys(this.milestones)
-    for(let level of levels.slice(1,levels.length-2)){
-      level=Number(level)
-      if(pool.size==0) return false
-      let candidates=Array.from(pool).flatMap(act=>acts.acts[act])
-      let normal=level<50&&false //TODO
-      let arealevel=level+3
-      candidates=candidates.filter(area=>normal?area.isnormal(arealevel):area.iselite(arealevel))
-      if(candidates.length==0) return false
-      let area=pick(Array.from(candidates))
-      this.milestones[level]=[normal?'Normal':'Elite','Act '+area.act,area.name]
+    for(let level of levels.slice(1,levels.length-1).map(level=>Number(level))){
+      let areas=Array.from(pool).flatMap(act=>acts.acts[act])
+      let area=pick(areas.filter(area=>area.isnormal(level)))
+      this.milestones[level]=['Normal','Act '+area.act,area.name]
       pool.delete(area.act)
     }
     return true
