@@ -21,12 +21,12 @@ function round(level){
 class Route{
   constructor(){
     this.milestones={//TODO should be easy enough to have 1 milestone = 1 act, no act 1 while leveling!
-      1:['Aspirant','','Crucible'], //crucible
-      25:false, //normal - or elite from get-go?
-      35:false, 
-      45:false,
-      55:false, //elite
-      65:false,
+      1:['Aspirant','','Crucible'], 
+      20:false, 
+      30:false, 
+      40:false,
+      50:false, 
+      60:false, 
       70:['Ultimate','Act 1','Main quest'], //act 1 ultimate
       100:['Ultimate','Act 7','Shattered Realm'],
     }
@@ -37,16 +37,17 @@ class Route{
   //TODO can try using levels from wiki instead
   generate(){
     let pool=new Set([2,3,4,5,6,7])
-    for(let level of Object.keys(this.milestones).slice(1,6)){
+    let levels=Object.keys(this.milestones)
+    for(let level of levels.slice(1,levels.length-2)){
       level=Number(level)
       if(pool.size==0) return false
-      let difficulty='Elite'
       let candidates=Array.from(pool).flatMap(act=>acts.acts[act])
-      let arealevel=level+1
-      candidates=candidates.filter(area=>area.iselite(arealevel))
+      let normal=level<50&&false //TODO
+      let arealevel=level+3
+      candidates=candidates.filter(area=>normal?area.isnormal(arealevel):area.iselite(arealevel))
       if(candidates.length==0) return false
       let area=pick(Array.from(candidates))
-      this.milestones[level]=[difficulty,'Act '+area.act,area.name]
+      this.milestones[level]=[normal?'Normal':'Elite','Act '+area.act,area.name]
       pool.delete(area.act)
     }
     return true
@@ -59,14 +60,13 @@ function test(){ //9-pass console output with ?debug URL parameter
     let r=new Route()
     if(r.generate()){
       i+=1
-      console.log(Object.keys(r.milestones).slice(1,6).map(level=>r.milestones[level][1]))
+      console.log(Object.keys(r.milestones).map(level=>r.milestones[level][1]))
     }
   }
 }
 
 export function setup(){
   acts.setup()
-  test()
   let r=false
   for(let i=0;i<ATTEMPTS;i++){
     r=new Route()
@@ -74,6 +74,7 @@ export function setup(){
     r=false
   }
   if(!r) throw 'Could not generate'
+  test()
   for(let m of Object.keys(r.milestones)){
     let level=document.createElement('div')
     level.innerHTML=m==100?'End-game':'Level '+m
